@@ -1,8 +1,22 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Copy } from "lucide-react";
 import './ChatBox.css';
+import { message } from "antd";
 
 const ChatBox = ({ messages, scrollRef, handleSendMessage, textAreaRef, loading }) => {
+  const [messageApi, contextHolder] = message.useMessage();
+  const [copiedCode, setCopiedCode] = useState(null);
+
+  useEffect(() => {
+    if (copiedCode !== null) {
+      messageApi.open({
+        type: 'success',
+        content: 'Copied to clipboard!',
+      });
+      setCopiedCode(null);
+    }
+  }, [copiedCode, messageApi]);
+
   const extractTextAndCode = (message) => {
     const regex = /```([\s\S]*?)```/g;
     let parts = [];
@@ -26,11 +40,12 @@ const ChatBox = ({ messages, scrollRef, handleSendMessage, textAreaRef, loading 
 
   const handleCopy = (code) => {
     navigator.clipboard.writeText(code);
-    alert("Copied to clipboard!");
+    setCopiedCode(code); // triggers useEffect
   };
 
   return (
     <div className="chat-box">
+      {contextHolder}
       {messages.map((msg, index) => (
         <div key={index} className={`message ${msg.isUser ? "user-message" : "bot-message"}`}>
           {extractTextAndCode(msg.text).map((part, i) =>
@@ -46,7 +61,6 @@ const ChatBox = ({ messages, scrollRef, handleSendMessage, textAreaRef, loading 
             )
           )}
 
-          {/* Question buttons */}
           {msg.questions?.length > 0 && (
             <div className="question-buttons">
               {msg.questions.map((q, idx) => (
@@ -68,7 +82,6 @@ const ChatBox = ({ messages, scrollRef, handleSendMessage, textAreaRef, loading 
         </div>
       ))}
 
-      {/* Typing loader while loading */}
       {loading && (
         <div className="bot-message">
           <div className="loader"></div>

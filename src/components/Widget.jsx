@@ -60,7 +60,7 @@ const Widget = () => {
   
   
   const generateResponse = (response) => {
-    const cleaned = response.replace(/\/end$/, "").trim();
+    const cleaned = response.replace("/end", "");
     const questionMatch = cleaned.match(/<questions>(.*?)<\/questions>/s);
     const questionText = questionMatch ? questionMatch[1].trim() : "";
     const questionList = questionText
