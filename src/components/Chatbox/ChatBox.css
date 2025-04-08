@@ -1,0 +1,64 @@
+.chat-box {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .message {
+    max-width: 80%;
+    word-wrap: break-word;
+  }
+  
+  .user-message {
+    align-self: flex-end;
+    background-color: #F4F4F4;
+    color: black;
+    padding: 4px 10px;
+    border-radius: 8px;
+  white-space: pre-line;
+  }
+  .user-message p {
+    margin: 0;
+  }
+
+  .bot-message {
+    align-self: flex-start;
+    color: black;
+  }
+  
+  .bot-text {
+    background-color: transparent;
+    padding: 10px;
+  }
+  
+  .code-block {
+    position: relative;
+    background-color: #282c34;
+    border-radius: 8px;
+    padding: 10px;
+    overflow-x: auto;
+    color: #ffffff;
+  }
+  
+  .code-block pre {
+    margin: 0;
+  }
+  
+  .copy-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+  }
+
+  .question-buttons {
+    margin-top: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  
+  
