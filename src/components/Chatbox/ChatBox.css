@@ -5,7 +5,7 @@
   }
   
   .message {
-    max-width: 80%;
+    /* max-width: 80%; */
     word-wrap: break-word;
   }
   
@@ -15,7 +15,9 @@
     color: black;
     padding: 4px 10px;
     border-radius: 8px;
-  white-space: pre-line;
+    max-width: 80%;
+   white-space: pre-line;
+   margin-top: 20px;
   }
   .user-message p {
     margin: 0;
@@ -24,6 +26,7 @@
   .bot-message {
     align-self: flex-start;
     color: black;
+    white-space: pre-line;   
   }
   
   .bot-text {
@@ -60,5 +63,27 @@
     flex-wrap: wrap;
     gap: 8px;
   }
+
+  /* HTML: <div class="loader"></div> */
+  .loader {
+    width: 40px;
+    aspect-ratio: 2;
+    --_g: no-repeat radial-gradient(circle closest-side, #000 80%, #0000);
+    background:
+      var(--_g) 0% 50%,
+      var(--_g) 50% 50%,
+      var(--_g) 100% 50%;
+    background-size: calc(100% / 3) 40%;
+    animation: l3 1s infinite linear;
+    margin: 10px 0;
+  }
+  
+  @keyframes l3 {
+    20% { background-position: 0% 0%, 50% 50%, 100% 50% }
+    40% { background-position: 0% 100%, 50% 0%, 100% 50% }
+    60% { background-position: 0% 50%, 50% 100%, 100% 0% }
+    80% { background-position: 0% 50%, 50% 50%, 100% 100% }
+  }
+  
   
   

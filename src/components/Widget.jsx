@@ -29,9 +29,10 @@ const Widget = () => {
   };
 
   // Inside Widget component...
-  const handleSendMessage = async () => {
+  const handleSendMessage = async (e, customMessage) => {
+    if (e) e.preventDefault();
     const textarea = textAreaRef.current;
-    const userMessage = textarea.value.trim();
+    const userMessage = customMessage || textarea.value.trim();
     if (!userMessage) return;
   
     setMessages((prev) => [...prev, { text: userMessage, isUser: true }]);
@@ -41,57 +42,67 @@ const Widget = () => {
     setLoading(true);
   
     try {
-      // Add placeholder loading message
       setMessages((prev) => [...prev, { text: "", isUser: false, isLoading: true }]);
-  
-      // Replace with your actual API endpoint
       const response = await axios.post("http://localhost:4000/proxy/chat", {
         message: userMessage,
         prevConversation,
-        appUID:APP_UID,
-        model
+        appUID: APP_UID,
+        model,
       });
   
       const botReply = response.data || "No response from server.";
       generateResponse(botReply);
-      console.log(response);
     } catch (error) {
       console.error("API Error:", error);
       generateResponse("Sorry, there was an error processing your request.");
     }
   };
   
+  
   const generateResponse = (response) => {
-    const questionPattern = /<questions>(.*?)<\/questions>/s;
-    const match = response.match(questionPattern);
+    const cleaned = response.replace(/\/end$/, "").trim();
+    const questionMatch = cleaned.match(/<questions>(.*?)<\/questions>/s);
+    const questionText = questionMatch ? questionMatch[1].trim() : "";
+    const questionList = questionText
+      ? questionText.split("?").map((q) => q.trim()).filter(Boolean)
+      : [];
   
-    let questions = [];
-    if (match) {
-      questions = match[1]
-        .split("?")
-        .map((q) => q.trim())
-        .filter((q) => q.length)
-        .map((q) => q.replace(/^\W+|\W+$/g, "")); // clean punctuation
-      response = response.replace(questionPattern, "").trim();
-    }
+    const textWithoutQuestions = questionMatch
+      ? cleaned.replace(questionMatch[0], "").trim()
+      : cleaned;
   
-    let words = response.split(" ");
+    const words = textWithoutQuestions.split(" ");
     let currentText = "";
     setLoading(false);
   
-    // Remove loading
-    setMessages((prev) => [...prev.slice(0, -1)]);
+    // Remove loading placeholder if it exists
+    setMessages((prev) => {
+      const newMessages = [...prev];
+      if (newMessages.length && newMessages[newMessages.length - 1].isLoading) {
+        newMessages.pop();
+      }
+      return [...newMessages, { text: "", isUser: false, questions: [] }];
+    });
   
     words.forEach((word, index) => {
       setTimeout(() => {
         currentText += word + " ";
-        setMessages((prev) => [
-          ...prev.slice(0, -1),
-          { text: currentText, isUser: false, questions },
-        ]);
-      }, index * 100);
+        setMessages((prev) => {
+          const updated = [...prev];
+          const lastIndex = updated.length - 1;
+          if (lastIndex >= 0 && !updated[lastIndex].isUser) {
+            updated[lastIndex] = {
+              ...updated[lastIndex],
+              text: currentText.trim(),
+              questions: index === words.length - 1 ? questionList : [], // Add questions at the end
+            };
+          }
+          return updated;
+        });
+      }, index * 50);
     });
   };
+  
   
 
     // Scroll to bottom when messages change
@@ -130,7 +141,15 @@ const Widget = () => {
 <p>I'm an AI assistant trained on documentation, help articles, and other content.</p>
 
 <p>Ask me anything </p>
-        <ChatBox messages={messages} scrollRef={chatEndRef} handleQuestionClick={handleQuestionClick}/>
+<div className="chat-area">
+<ChatBox 
+  messages={messages}
+  scrollRef={chatEndRef}
+  handleSendMessage={handleSendMessage}
+  loading={loading}
+  textAreaRef={textAreaRef}/>
+</div>
+       
 
         <div ref={inputDivRef} className="askAI-input-div">
           <textarea
