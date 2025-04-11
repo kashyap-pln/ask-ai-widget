@@ -1,11 +1,9 @@
 .ask-ai-btn {
   background-color: #F4F4F4;
   border: none;
+  height:40px;
   border-radius: 4px;
   outline: none;
-  position: fixed;
-  top: 20px;
-  right: 20px;
   z-index: 9999;
 }
 
